@@ -1,0 +1,1045 @@
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import Lenis from "lenis";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useInView,
+  useReducedMotion,
+  useMotionValueEvent,
+  AnimatePresence,
+} from "framer-motion";
+import {
+  Landmark,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  Menu,
+  X,
+} from "lucide-react";
+
+function AnimatedCounter({
+  target,
+  prefix = "",
+  suffix = "",
+  decimals = 0,
+}: {
+  target: number;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+}) {
+  const ref = useRef<HTMLSpanElement | null>(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const prefersReduced = useReducedMotion();
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    if (prefersReduced) {
+      setValue(target);
+      return;
+    }
+
+    let start: number | null = null;
+    const duration = 1200;
+    let rafId = 0;
+
+    const step = (ts: number) => {
+      if (start === null) start = ts;
+      const progress = Math.min(1, (ts - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(target * eased);
+      if (progress < 1) {
+        rafId = requestAnimationFrame(step);
+      }
+    };
+
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
+  }, [inView, target, prefersReduced]);
+
+  return (
+    <span ref={ref}>
+      {prefix}
+      {value.toFixed(decimals)}
+      {suffix}
+    </span>
+  );
+}
+
+const NAV_LINKS = [
+  { id: "features", label: "Features" },
+  { id: "how-it-works", label: "How it works" },
+  { id: "roles", label: "Portals" },
+  { id: "security", label: "Security" },
+];
+
+const STICKY_FEATURES = [
+  {
+    id: "transfers",
+    badge: "01 / Transfers",
+    title: "Send money with full checks",
+    description:
+      "Every transfer checks your available balance, daily limit, recipient status, and Transaction PIN on the server before updating both accounts together.",
+    points: [
+      "Transfer between your own accounts or to other customers",
+      "Daily and single-transaction limits enforced per account",
+      "Download a PDF receipt for any completed transfer",
+    ],
+  },
+  {
+    id: "analytics",
+    badge: "02 / Analytics",
+    title: "Clear view of every account",
+    description:
+      "Track deposits, withdrawals, monthly spending, and loan balances across Savings, Current, and Business accounts using live account data.",
+    points: [
+      "Monthly deposit and spending charts",
+      "Switch between multiple accounts in one click",
+      "Export CSV and PDF account statements",
+    ],
+  },
+  {
+    id: "governance",
+    badge: "03 / Controls",
+    title: "Separate access by role",
+    description:
+      "Customers, Bank Staff, and Admins each see only the pages and actions meant for their role, with every request verified on the server.",
+    points: [
+      "Staff cannot approve their own requests or change bank limits",
+      "Unusual transfers are flagged for admin review",
+      "Admins can freeze accounts or reverse transfers",
+    ],
+  },
+];
+
+const ROLE_TABS = [
+  {
+    id: "customer",
+    label: "Customer",
+    headline: "Personal and business accounts",
+    summary:
+      "Switch between Savings, Current, and Business accounts, send PIN-verified transfers, apply for loans, and download PDF or CSV statements.",
+    metrics: [
+      { label: "Total Balance", value: "$92,650.50" },
+      { label: "Active Loan", value: "$10,000.00" },
+      { label: "Monthly Deposits", value: "+$18,000.00" },
+    ],
+    rows: [
+      "Savings • 1001000001 — $28,450.00",
+      "Business • 1001000002 — $64,200.50",
+      "Loan Installment #3 Paid — $1,085.00",
+    ],
+  },
+  {
+    id: "staff",
+    label: "Bank Staff",
+    headline: "Customer onboarding and queues",
+    summary:
+      "Register new customers, verify customer details, approve or reject deposit and withdrawal requests, flag unusual activity, and forward loans.",
+    metrics: [
+      { label: "Pending Requests", value: "2 Open" },
+      { label: "KYC Verified", value: "67%" },
+      { label: "Loan Reviews", value: "2 Open" },
+    ],
+    rows: [
+      "Deposit Request $3,500.00 — Pending",
+      "Withdrawal Request $950.00 — Pending",
+      "Loan Application #L-104 — Forwarded",
+    ],
+  },
+  {
+    id: "admin",
+    label: "Admin",
+    headline: "Bank-wide oversight and limits",
+    summary:
+      "Monitor total bank balances, freeze accounts, set transfer limits, reverse transfers, and approve or reject loan applications.",
+    metrics: [
+      { label: "Bank Balance", value: "$112,750.75" },
+      { label: "Flagged Items", value: "1 Alert" },
+      { label: "Pending Loans", value: "2 Review" },
+    ],
+    rows: [
+      "TXN-202611-100011 ($6,400) — Flagged",
+      "Default Daily Limit — $10,000.00",
+      "Business Loan — Disbursed $12,000.00",
+    ],
+  },
+];
+
+const MARQUEE_ITEMS = [
+  "SAVINGS ACCOUNTS",
+  "CURRENT ACCOUNTS",
+  "BUSINESS ACCOUNTS",
+  "FUND TRANSFERS",
+  "DEPOSIT & WITHDRAWAL",
+  "LOAN SCHEDULES",
+  "PDF STATEMENTS",
+];
+
+export function AegisLandingPage() {
+  const prefersReduced = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [activeRole, setActiveRole] = useState<"customer" | "staff" | "admin">("customer");
+
+  // Scroll-aware navbar state
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const stickyRef = useRef<HTMLDivElement | null>(null);
+  const stepsRef = useRef<HTMLDivElement | null>(null);
+  const securityRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Lenis smooth scrolling
+  useEffect(() => {
+    if (prefersReduced) return;
+    const lenis = new Lenis({
+      duration: 1.05,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+
+    let rafId = 0;
+    const raf = (time: number) => {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    };
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, [prefersReduced]);
+
+  // Global scroll tracking for floating pill navbar (always visible on scroll down & up)
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 20);
+  });
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Active section highlight with IntersectionObserver
+  useEffect(() => {
+    const sections = NAV_LINKS.map((n) => document.getElementById(n.id)).filter(
+      (el): el is HTMLElement => Boolean(el)
+    );
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        }
+      },
+      { rootMargin: "-40% 0px -45% 0px" }
+    );
+
+    sections.forEach((sec) => observer.observe(sec));
+    return () => observer.disconnect();
+  }, []);
+
+  // Hero parallax transforms
+  const { scrollYProgress: heroScroll } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const disableParallax = prefersReduced || isMobile;
+  const cardParallaxY = useTransform(heroScroll, [0, 1], disableParallax ? [0, 0] : [0, -55]);
+  const mockupParallaxY = useTransform(heroScroll, [0, 1], disableParallax ? [0, 0] : [0, -25]);
+
+  // Sticky features scroll progress & parallax
+  const { scrollYProgress: stickyScroll } = useScroll({
+    target: stickyRef,
+    offset: ["start end", "end start"],
+  });
+  const featuresBgParallaxY = useTransform(
+    stickyScroll,
+    [0, 1],
+    disableParallax ? [0, 0] : [-70, 70]
+  );
+  const featuresBgScale = useTransform(
+    stickyScroll,
+    [0, 1],
+    disableParallax ? [1, 1] : [1.08, 1.18]
+  );
+  useMotionValueEvent(stickyScroll, "change", (latest) => {
+    if (latest < 0.42) setActiveFeature(0);
+    else if (latest < 0.68) setActiveFeature(1);
+    else setActiveFeature(2);
+  });
+
+  // How it works progress line
+  const { scrollYProgress: stepsScroll } = useScroll({
+    target: stepsRef,
+    offset: ["start 80%", "end 60%"],
+  });
+
+  // Security section lower-image parallax
+  const { scrollYProgress: securityScroll } = useScroll({
+    target: securityRef,
+    offset: ["start end", "end start"],
+  });
+  const securityBgParallaxY = useTransform(
+    securityScroll,
+    [0, 1],
+    disableParallax ? [0, 0] : [-40, 40]
+  );
+
+  const headlineWords = ["Digital", "banking", "built", "for", "daily", "operations."];
+  const currentRole = ROLE_TABS.find((r) => r.id === activeRole) ?? ROLE_TABS[0];
+
+  return (
+    <div className="min-h-screen bg-background text-foreground selection:bg-indigo-500/20">
+      {/* Scroll-Aware Floating Pill Navbar */}
+      <header className="fixed inset-x-0 top-0 z-50 px-3 sm:px-6">
+        <div
+          className={`mx-auto flex items-center justify-between transition-all duration-300 ${isScrolled
+              ? "mt-3 h-14 max-w-4xl rounded-full border bg-background/85 px-5 shadow-lg backdrop-blur-xl"
+              : "h-16 max-w-6xl border-b border-transparent bg-transparent px-2"
+            }`}
+        >
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
+              <Landmark className="h-4 w-4" />
+            </div>
+            <span className="text-base font-bold tracking-tight">AegisBank</span>
+          </Link>
+
+          <nav className="hidden items-center gap-1 md:flex">
+            {NAV_LINKS.map((item) => {
+              const active = activeSection === item.id;
+              return (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition ${active
+                      ? "bg-indigo-600/10 text-indigo-600 dark:text-indigo-400"
+                      : "text-muted-foreground hover:text-foreground"
+                    }`}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
+          </nav>
+
+          <div className="hidden items-center gap-2.5 md:flex">
+            <Link
+              href="/login"
+              className="rounded-full px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/register"
+              className="rounded-full bg-indigo-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-700"
+            >
+              Open Account
+            </Link>
+          </div>
+
+          {/* Mobile Hamburger Trigger */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="rounded-xl border p-2 text-foreground md:hidden"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+        </div>
+
+        {/* Mobile Hamburger Drawer */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="mx-auto mt-2 max-w-md rounded-2xl border bg-card p-4 shadow-xl md:hidden"
+            >
+              <div className="flex flex-col space-y-1">
+                {NAV_LINKS.map((item) => (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`rounded-xl px-3 py-2.5 text-sm font-medium ${activeSection === item.id
+                        ? "bg-indigo-600/10 text-indigo-600 dark:text-indigo-400"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2 border-t pt-4">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-xl border py-2 text-center text-xs font-semibold"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-xl bg-indigo-600 py-2 text-center text-xs font-semibold text-white"
+                >
+                  Open Account
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* 1. HERO: Gradient Mesh + Word-by-Word Reveal + Floating 3D Card & Dashboard Mockup */}
+      <section
+        ref={heroRef}
+        className="relative overflow-hidden border-b pb-20 pt-28 lg:pb-28 lg:pt-36"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{
+            background:
+              "radial-gradient(circle at 18% 20%, rgba(79,70,229,0.14), transparent 45%), radial-gradient(circle at 82% 28%, rgba(16,185,129,0.12), transparent 42%)",
+          }}
+        />
+
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12">
+          <div className="lg:col-span-6">
+            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+              {headlineWords.map((word, idx) => (
+                <motion.span
+                  key={word + idx}
+                  initial={prefersReduced ? false : { opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: prefersReduced ? 0 : idx * 0.07 }}
+                  className="mr-3 inline-block"
+                >
+                  {word}
+                </motion.span>
+              ))}
+            </h1>
+
+            <motion.p
+              initial={prefersReduced ? false : { opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.35 }}
+              className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
+            >
+              Manage bank accounts, transfer funds, process deposit and
+              withdrawal requests, and track loans across Customer, Staff, and
+              Admin portals.
+            </motion.p>
+
+            <motion.div
+              initial={prefersReduced ? false : { opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.45 }}
+              className="mt-8 flex flex-wrap items-center gap-4"
+            >
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-700"
+              >
+                Open Banking Portal
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 rounded-2xl border bg-card px-6 py-3 text-sm font-semibold transition hover:bg-muted"
+              >
+                Create Customer Account
+              </Link>
+            </motion.div>
+          </div>
+
+          <div className="relative lg:col-span-6">
+            <motion.div
+              style={{ y: mockupParallaxY }}
+              initial={prefersReduced ? false : { opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.55, delay: 0.2 }}
+              className="rounded-3xl border bg-card/95 p-5 shadow-2xl backdrop-blur-md sm:p-6"
+            >
+              <div className="flex items-center justify-between border-b pb-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">Combined Balance</p>
+                  <p className="text-xl font-bold">$92,650.50</p>
+                </div>
+                <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  Active
+                </span>
+              </div>
+
+              <svg viewBox="0 0 360 90" className="mt-4 h-24 w-full overflow-visible">
+                <defs>
+                  <linearGradient id="heroChartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4F46E5" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#4F46E5" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M0 72 Q 50 66, 95 48 T 190 40 T 275 22 L 360 10 L 360 90 L 0 90 Z"
+                  fill="url(#heroChartGrad)"
+                />
+                <path
+                  d="M0 72 Q 50 66, 95 48 T 190 40 T 275 22 L 360 10"
+                  fill="none"
+                  stroke="#4F46E5"
+                  strokeWidth="2.5"
+                />
+              </svg>
+
+              <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                <div className="rounded-xl border bg-background p-3">
+                  <p className="text-muted-foreground">Savings • 0001</p>
+                  <p className="mt-1 font-bold">$28,450.00</p>
+                </div>
+                <div className="rounded-xl border bg-background p-3">
+                  <p className="text-muted-foreground">Business • 0002</p>
+                  <p className="mt-1 font-bold">$64,200.50</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              style={{ y: cardParallaxY }}
+              initial={prefersReduced ? false : { opacity: 0, x: 20, rotate: -4 }}
+              animate={{ opacity: 1, x: 0, rotate: -5 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
+              whileHover={prefersReduced ? undefined : { rotate: -1, scale: 1.02 }}
+              className="ml-auto mt-4 w-72 rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-slate-900 p-5 text-white shadow-2xl shadow-indigo-950/40 sm:-mt-10 sm:mr-4"
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold tracking-wider">AEGIS BUSINESS</span>
+                <span className="rounded bg-white/15 px-1.5 py-0.5 text-[10px]">
+                  USD
+                </span>
+              </div>
+              <p className="mt-5 font-mono text-sm tracking-widest">
+                •••• •••• •••• 0002
+              </p>
+              <div className="mt-3 flex items-center justify-between text-[11px] text-indigo-100">
+                <span>SOPHIA STERLING</span>
+                <span className="rounded bg-emerald-400/20 px-1.5 py-0.5 text-emerald-200">
+                  ACTIVE
+                </span>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. TRUST STRIP: Infinite Marquee + Animated Number Counters */}
+      <section className="border-b bg-card/40 py-12">
+        <div className="overflow-hidden border-b pb-8">
+          <div className="animate-marquee gap-12 text-xs font-semibold tracking-widest text-muted-foreground">
+            {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, idx) => (
+              <span key={idx} className="inline-flex items-center gap-3 px-4">
+                <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mx-auto mt-10 grid max-w-6xl gap-6 px-4 text-center sm:grid-cols-2 lg:grid-cols-4 sm:px-6">
+          <div className="rounded-2xl border bg-card p-5 shadow-sm">
+            <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+              <AnimatedCounter target={99.99} decimals={2} suffix="%" />
+            </p>
+            <p className="mt-1 text-xs font-medium text-muted-foreground">
+              Transaction Consistency
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 shadow-sm">
+            <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+              <AnimatedCounter target={2.4} decimals={1} prefix="$" suffix="B+" />
+            </p>
+            <p className="mt-1 text-xs font-medium text-muted-foreground">
+              Simulated Volume Capacity
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 shadow-sm">
+            <p className="text-3xl font-bold">
+              <AnimatedCounter target={120} prefix="<" suffix="ms" />
+            </p>
+            <p className="mt-1 text-xs font-medium text-muted-foreground">
+              Average Transfer Time
+            </p>
+          </div>
+          <div className="rounded-2xl border bg-card p-5 shadow-sm">
+            <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+              <AnimatedCounter target={3} />
+            </p>
+            <p className="mt-1 text-xs font-medium text-muted-foreground">
+              Dedicated User Portals
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. FEATURES: Sticky Scroll Section with Dark Banking Parallax Background */}
+      <section
+        id="features"
+        ref={stickyRef}
+        className="relative isolate overflow-clip bg-[#0B0D14] py-24 text-white"
+      >
+        {/* Parallax Banking Image Layer */}
+        <motion.div
+          aria-hidden="true"
+          style={{
+            y: featuresBgParallaxY,
+            scale: featuresBgScale,
+            backgroundImage: "url('/images/banking-parallax.jpg')",
+          }}
+          className="pointer-events-none absolute -inset-y-24 inset-x-0 z-0 bg-cover bg-center bg-no-repeat"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[1] bg-[#0B0D14]/65 backdrop-blur-[1px]"
+        />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid gap-12 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-28">
+              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400">
+                Core Features
+              </span>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                Built for daily banking workflows
+              </h2>
+
+              <div className="mt-8 space-y-4">
+                {STICKY_FEATURES.map((feat, idx) => {
+                  const isActive = idx === activeFeature;
+                  return (
+                    <button
+                      key={feat.id}
+                      onClick={() => setActiveFeature(idx)}
+                      className={`w-full rounded-2xl border p-4 text-left backdrop-blur-md transition ${isActive
+                          ? "border-indigo-400/70 bg-[#0B0D14]/75 shadow-lg"
+                          : "border-white/15 bg-[#0B0D14]/50 opacity-75 hover:opacity-100"
+                        }`}
+                    >
+                      <p className="text-[11px] font-semibold uppercase text-indigo-400">
+                        {feat.badge}
+                      </p>
+                      <h3 className="mt-1 text-base font-semibold text-white">
+                        {feat.title}
+                      </h3>
+                      {isActive && (
+                        <p className="mt-1.5 text-xs leading-relaxed text-slate-300">
+                          {feat.description}
+                        </p>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-8 lg:col-span-7">
+            <div className="rounded-3xl border border-white/15 bg-[#0B0D14]/75 p-6 shadow-2xl backdrop-blur-md lg:sticky lg:top-28 sm:p-8">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={STICKY_FEATURES[activeFeature].id}
+                  initial={prefersReduced ? false : { opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={prefersReduced ? undefined : { opacity: 0, y: -12 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                    <span className="text-xs font-semibold uppercase text-indigo-400">
+                      {STICKY_FEATURES[activeFeature].badge}
+                    </span>
+                    <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
+                      Included
+                    </span>
+                  </div>
+
+                  <h3 className="mt-5 text-2xl font-bold text-white">
+                    {STICKY_FEATURES[activeFeature].title}
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-300">
+                    {STICKY_FEATURES[activeFeature].description}
+                  </p>
+
+                  <div className="mt-6 space-y-3">
+                    {STICKY_FEATURES[activeFeature].points.map((pt) => (
+                      <div
+                        key={pt}
+                        className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-100"
+                      >
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                        <span>{pt}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Real UI Snippet Preview (No Decorative Icons) */}
+                  <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+                    {activeFeature === 0 && (
+                      <div className="flex items-center justify-between text-xs">
+                        <div>
+                          <p className="font-mono font-semibold text-white">1001000001 → 1001000003</p>
+                          <p className="text-slate-400">TXN-202611-100011</p>
+                        </div>
+                        <span className="rounded-lg bg-emerald-600 px-2.5 py-1 font-semibold text-white">
+                          $3,200.00 Completed
+                        </span>
+                      </div>
+                    )}
+                    {activeFeature === 1 && (
+                      <div className="flex items-center justify-between text-xs">
+                        <div>
+                          <p className="font-semibold text-white">Business Account • 1001000002</p>
+                          <p className="text-slate-400">Available Balance</p>
+                        </div>
+                        <span className="font-mono text-base font-bold text-emerald-400">
+                          $64,200.50
+                        </span>
+                      </div>
+                    )}
+                    {activeFeature === 2 && (
+                      <div className="flex items-center justify-between text-xs">
+                        <div>
+                          <p className="font-semibold text-white">Daily Transfer Limit</p>
+                          <p className="text-slate-400">Account 1001000001</p>
+                        </div>
+                        <span className="rounded-lg bg-indigo-600 px-2.5 py-1 font-semibold text-white">
+                          $15,000.00 / day
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <div className="hidden h-48 lg:block" />
+            <div className="hidden h-48 lg:block" />
+          </div>
+        </div>
+        </div>
+      </section>
+
+      {/* 4. HOW IT WORKS: 3 Steps with Scroll-Triggered Progress Line */}
+      <section id="how-it-works" ref={stepsRef} className="border-y bg-card/40 py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              How It Works
+            </span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+              Three steps from sign up to settlement
+            </h2>
+          </div>
+
+          <div className="relative mt-14">
+            <div className="absolute left-0 right-0 top-6 hidden h-0.5 bg-border md:block">
+              <motion.div
+                style={{ scaleX: prefersReduced ? 1 : stepsScroll, transformOrigin: "left" }}
+                className="h-full bg-gradient-to-r from-indigo-600 to-emerald-500"
+              />
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-3">
+              {[
+                {
+                  step: "01",
+                  title: "Open an account",
+                  desc: "Customers sign up online or through Bank Staff to open Savings, Current, or Business accounts.",
+                },
+                {
+                  step: "02",
+                  title: "Deposit and transfer",
+                  desc: "Submit deposit or withdrawal requests for review and send PIN-verified transfers to any account.",
+                },
+                {
+                  step: "03",
+                  title: "Review and approve",
+                  desc: "Staff verify requests and forward loans; Admins approve disbursements and monitor flagged items.",
+                },
+              ].map((item, idx) => (
+                <motion.div
+                  key={item.step}
+                  initial={prefersReduced ? false : { opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.4, delay: idx * 0.1 }}
+                  className="relative rounded-2xl border bg-card p-6 shadow-sm"
+                >
+                  <span className="inline-block rounded-xl bg-indigo-600 px-3 py-1.5 font-mono text-xs font-bold text-white">
+                    Step {item.step}
+                  </span>
+                  <h3 className="mt-4 text-lg font-semibold">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {item.desc}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. ROLE SHOWCASE: Tabs for Customer / Staff / Admin */}
+      <section id="roles" className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
+        <motion.div
+          initial={prefersReduced ? false : { opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.4 }}
+          className="text-center"
+        >
+          <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+            Role Portals
+          </span>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+            Built for each user role
+          </h2>
+
+          <div className="mt-8 inline-flex rounded-2xl border bg-card p-1.5 shadow-sm">
+            {ROLE_TABS.map((tab) => {
+              const isSelected = activeRole === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveRole(tab.id as typeof activeRole)}
+                  className={`relative rounded-xl px-4 py-2 text-xs font-semibold transition sm:text-sm ${isSelected ? "text-white" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                >
+                  {isSelected && (
+                    <motion.span
+                      layoutId="roleTabPill"
+                      className="absolute inset-0 rounded-xl bg-indigo-600"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        <div className="mt-10 rounded-3xl border bg-card p-6 shadow-xl sm:p-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentRole.id}
+              initial={prefersReduced ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={prefersReduced ? undefined : { opacity: 0, y: -10 }}
+              transition={{ duration: 0.25 }}
+              className="grid gap-8 lg:grid-cols-12"
+            >
+              <div className="lg:col-span-5">
+                <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                  {currentRole.label} Portal
+                </span>
+                <h3 className="mt-4 text-2xl font-bold">{currentRole.headline}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {currentRole.summary}
+                </p>
+                <Link
+                  href="/login"
+                  className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-indigo-700"
+                >
+                  Open {currentRole.label} Demo
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
+              <div className="space-y-4 lg:col-span-7">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {currentRole.metrics.map((m) => (
+                    <div key={m.label} className="rounded-2xl border bg-background p-4">
+                      <p className="text-[11px] text-muted-foreground">{m.label}</p>
+                      <p className="mt-1 text-lg font-bold">{m.value}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-2">
+                  {currentRole.rows.map((row) => (
+                    <div
+                      key={row}
+                      className="flex items-center justify-between rounded-xl border bg-background px-4 py-3 text-xs font-medium"
+                    >
+                      <span>{row}</span>
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </section>
+
+      {/* 6. SECURITY: Dark Section with Lower Parallax Image + Animated Shield */}
+      <section
+        id="security"
+        ref={securityRef}
+        className="relative isolate overflow-hidden bg-[#0B0D14] py-24 text-white"
+      >
+        <motion.div
+          aria-hidden="true"
+          style={{
+            y: securityBgParallaxY,
+            backgroundImage: "url('/images/banking-parallax.jpg')",
+            backgroundPosition: "center bottom",
+          }}
+          className="pointer-events-none absolute -inset-y-20 inset-x-0 z-0 scale-110 bg-cover bg-no-repeat"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[1] bg-[#0B0D14]/65 backdrop-blur-[1px]"
+        />
+        <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12">
+          <motion.div
+            initial={prefersReduced ? false : { opacity: 0, scale: 0.94 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.45 }}
+            className="flex flex-col items-center justify-center rounded-3xl border border-white/15 bg-[#0B0D14]/65 p-10 text-center backdrop-blur-md lg:col-span-5"
+          >
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-3xl bg-indigo-600/20 text-indigo-400">
+              {!prefersReduced && (
+                <motion.span
+                  animate={{ scale: [1, 1.25, 1], opacity: [0.5, 0, 0.5] }}
+                  transition={{ duration: 2.8, repeat: Infinity }}
+                  className="absolute inset-0 rounded-3xl border border-indigo-400/40"
+                />
+              )}
+              <ShieldCheck className="h-12 w-12 text-emerald-400" />
+            </div>
+            <h3 className="mt-6 text-xl font-bold">Server-First Validation</h3>
+            <p className="mt-2 text-xs leading-relaxed text-slate-400">
+              Balances, limits, PINs, and permissions are always checked on the
+              server before any money moves.
+            </p>
+          </motion.div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-7">
+            {[
+              {
+                snippet: "$28,450.00 → $25,250.00",
+                title: "Consistent transfers",
+                desc: "Sender debit and receiver credit succeed or fail together in one database transaction.",
+              },
+              {
+                snippet: "PIN •••• + 2FA 123456",
+                title: "PIN and 2FA checks",
+                desc: "Every transfer checks your hashed Transaction PIN and optional 6-digit 2FA code.",
+              },
+              {
+                snippet: "Daily Cap: $10,000.00",
+                title: "Account limits",
+                desc: "Per-account daily limits, single-transfer caps, and minimum balances are enforced.",
+              },
+              {
+                snippet: "Key: tx_98a7c2f1",
+                title: "Duplicate prevention",
+                desc: "Idempotency keys prevent double-charging if a transfer is submitted twice.",
+              },
+            ].map((item, idx) => (
+              <motion.div
+                key={item.title}
+                initial={prefersReduced ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.4, delay: idx * 0.08 }}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+              >
+                <span className="inline-block rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[11px] text-emerald-300">
+                  {item.snippet}
+                </span>
+                <h4 className="mt-3 text-sm font-semibold">{item.title}</h4>
+                <p className="mt-1 text-xs leading-relaxed text-slate-400">
+                  {item.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. FINAL CTA + FOOTER */}
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <motion.div
+          initial={prefersReduced ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col items-center justify-between gap-6 rounded-3xl bg-gradient-to-r from-indigo-600 to-indigo-800 p-8 text-white shadow-xl sm:flex-row sm:p-12"
+        >
+          <div>
+            <h2 className="text-2xl font-bold sm:text-3xl">
+              Try AegisBank today
+            </h2>
+            <p className="mt-1.5 text-sm text-indigo-100">
+              Sign in with demo accounts for Admin, Bank Staff, or Customer.
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-3">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50"
+            >
+              Sign In
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+
+      <footer className="border-t bg-card/40 py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 text-xs text-muted-foreground sm:flex-row sm:px-6">
+          <div className="flex items-center gap-2 font-semibold text-foreground">
+            <Landmark className="h-4 w-4 text-indigo-600" />
+            AegisBank
+          </div>
+          <p>Simulated digital banking application — no real financial transactions.</p>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="hover:text-foreground">
+              Sign In
+            </Link>
+            <Link href="/register" className="hover:text-foreground">
+              Register
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
