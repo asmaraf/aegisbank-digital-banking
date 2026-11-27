@@ -20,7 +20,7 @@ export default withAuth(
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
-    if (pathname.startsWith("/customer") && role !== "CUSTOMER" && role !== "ADMIN") {
+    if (pathname.startsWith("/customer") && role !== "CUSTOMER") {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 

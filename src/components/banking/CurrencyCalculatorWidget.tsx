@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Lock, ArrowRight, Clock, ShieldCheck, ChevronDown, Check } from "lucide-react";
 
 interface CountryOption {
@@ -81,9 +83,25 @@ const DESTINATIONS: CountryOption[] = [
 ];
 
 export function CurrencyCalculatorWidget() {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [sendAmount, setSendAmount] = useState<number>(1000);
   const [selectedDest, setSelectedDest] = useState<CountryOption>(DESTINATIONS[0]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const handleSendMoney = () => {
+    if (!session?.user) {
+      toast.info("Please sign in as a Customer to send money.");
+      router.push("/login");
+    } else if (session.user.role === "CUSTOMER") {
+      router.push("/customer/transfer");
+    } else {
+      toast.info(
+        `You are logged in as ${session.user.role}. Please sign in with a Customer account to transfer funds.`
+      );
+      router.push("/login");
+    }
+  };
 
   // Fee calculation (transparent: 1% + $0.77 base, max $25)
   const fee = Math.min(25, +(sendAmount * 0.01 + 0.77).toFixed(2));
@@ -261,13 +279,14 @@ export function CurrencyCalculatorWidget() {
         </div>
 
         {/* Action Button */}
-        <Link
-          href="/customer/transfer"
+        <button
+          type="button"
+          onClick={handleSendMoney}
           className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/25 transition hover:bg-emerald-700 active:scale-[0.99]"
         >
           <span>Send money now</span>
           <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-        </Link>
+        </button>
       </div>
     </div>
   );
