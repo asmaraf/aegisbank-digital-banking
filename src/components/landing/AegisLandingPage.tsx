@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { useSession, signOut } from "next-auth/react";
 import Lenis from "lenis";
 import { CurrencyCalculatorWidget } from "@/components/banking/CurrencyCalculatorWidget";
 import {
@@ -23,6 +24,9 @@ import {
   X,
   Sun,
   Moon,
+  LayoutDashboard,
+  LogOut,
+  User,
 } from "lucide-react";
 
 function AnimatedCounter({
@@ -186,12 +190,22 @@ const MARQUEE_ITEMS = [
 ];
 
 export function AegisLandingPage() {
+  const { data: session, status } = useSession();
   const prefersReduced = useReducedMotion();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const [activeRole, setActiveRole] = useState<"customer" | "staff" | "admin">("customer");
+
+  const isAuthenticated = mounted && status === "authenticated" && Boolean(session?.user);
+
+  const dashboardHref =
+    session?.user?.role === "ADMIN"
+      ? "/admin"
+      : session?.user?.role === "STAFF"
+      ? "/staff"
+      : "/customer";
 
   // Scroll-aware navbar state
   const [isScrolled, setIsScrolled] = useState(false);
@@ -324,7 +338,7 @@ export function AegisLandingPage() {
       <header className="fixed inset-x-0 top-0 z-50 px-3 sm:px-6">
         <div
           className={`mx-auto flex items-center justify-between transition-all duration-300 ${isScrolled
-              ? "mt-3 h-14 max-w-4xl rounded-full border bg-background/85 px-5 shadow-lg backdrop-blur-xl"
+              ? "mt-3 h-14 max-w-5xl rounded-full border bg-background/85 px-5 shadow-lg backdrop-blur-xl"
               : "h-16 max-w-6xl border-b border-transparent bg-transparent px-2"
             }`}
         >
@@ -366,18 +380,67 @@ export function AegisLandingPage() {
                 <Moon className="h-3.5 w-3.5" />
               )}
             </button>
-            <Link
-              href="/login"
-              className="rounded-full px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/register"
-              className="rounded-full bg-indigo-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-700"
-            >
-              Open Account
-            </Link>
+
+            {isAuthenticated && session?.user ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  href={dashboardHref}
+                  className="group flex items-center gap-2 rounded-full border border-border/80 bg-background/80 py-1 pl-1.5 pr-2.5 text-xs transition hover:border-indigo-500/50 hover:bg-muted"
+                  title={`Signed in as ${session.user.name} (${session.user.role})`}
+                >
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 text-[11px] font-bold text-white shadow-sm">
+                    {session.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
+                  </div>
+                  <div className="flex flex-col text-left leading-none">
+                    <span className="max-w-[120px] truncate font-semibold text-foreground text-xs group-hover:text-indigo-500 transition-colors">
+                      {session.user.name}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-mono">
+                      ID: {session.user.id ? `${session.user.id.slice(0, 8)}...` : session.user.email}
+                    </span>
+                  </div>
+                  <span className="rounded-full bg-indigo-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-indigo-500 border border-indigo-500/20">
+                    {session.user.role}
+                  </span>
+                </Link>
+
+                <Link
+                  href={dashboardHref}
+                  className="flex items-center gap-1.5 rounded-full bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700 active:scale-[0.98]"
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  <span>Dashboard</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await signOut({ redirect: false });
+                    window.location.href = "/";
+                  }}
+                  className="rounded-full border p-1.5 text-muted-foreground transition hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-500"
+                  title="Sign Out"
+                  aria-label="Sign Out"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded-full px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-full bg-indigo-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-700"
+                >
+                  Open Account
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Hamburger Trigger */}
@@ -434,22 +497,65 @@ export function AegisLandingPage() {
                   )}
                 </button>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-xl border py-2 text-center text-xs font-semibold"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-xl bg-indigo-600 py-2 text-center text-xs font-semibold text-white"
-                >
-                  Open Account
-                </Link>
-              </div>
+
+              {isAuthenticated && session?.user ? (
+                <div className="mt-3 space-y-2.5 border-t pt-3">
+                  <div className="flex items-center gap-3 rounded-2xl border bg-muted/40 p-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 text-sm font-bold text-white shadow-sm">
+                      {session.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
+                    </div>
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <span className="font-semibold text-sm truncate">{session.user.name}</span>
+                      <span className="text-xs text-muted-foreground font-mono truncate">
+                        ID: {session.user.id ? `${session.user.id.slice(0, 10)}...` : session.user.email}
+                      </span>
+                    </div>
+                    <span className="rounded-full bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold uppercase text-indigo-500 border border-indigo-500/20">
+                      {session.user.role}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
+                      href={dashboardHref}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 py-2.5 text-center text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                    >
+                      <LayoutDashboard className="h-3.5 w-3.5" />
+                      Dashboard
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setMobileMenuOpen(false);
+                        await signOut({ redirect: false });
+                        window.location.href = "/";
+                      }}
+                      className="flex items-center justify-center gap-1.5 rounded-xl border py-2.5 text-center text-xs font-semibold text-muted-foreground transition hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-500"
+                    >
+                      <LogOut className="h-3.5 w-3.5" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-xl border py-2 text-center text-xs font-semibold"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-xl bg-indigo-600 py-2 text-center text-xs font-semibold text-white"
+                  >
+                    Open Account
+                  </Link>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -503,18 +609,22 @@ export function AegisLandingPage() {
               className="mt-8 flex flex-wrap items-center gap-4"
             >
               <Link
-                href="/login"
+                href={isAuthenticated ? dashboardHref : "/login"}
                 className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-700"
               >
-                Open Banking Portal
+                {isAuthenticated && session?.user
+                  ? `Go to ${session.user.role === "ADMIN" ? "Admin" : session.user.role === "STAFF" ? "Staff" : "Customer"} Portal`
+                  : "Open Banking Portal"}
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link
-                href="/register"
-                className="inline-flex items-center gap-2 rounded-2xl border bg-card px-6 py-3 text-sm font-semibold transition hover:bg-muted"
-              >
-                Create Customer Account
-              </Link>
+              {!isAuthenticated && (
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-2 rounded-2xl border bg-card px-6 py-3 text-sm font-semibold transition hover:bg-muted"
+                >
+                  Create Customer Account
+                </Link>
+              )}
             </motion.div>
           </div>
 
