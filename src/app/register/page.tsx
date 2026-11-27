@@ -83,7 +83,7 @@ export default function RegisterPage() {
                 </label>
                 <input
                   {...register("name")}
-                  placeholder="e.g. John Doe"
+                  placeholder="Alex Rivera"
                   className="w-full rounded-xl border bg-background px-3.5 py-2 text-sm outline-none focus:border-indigo-500"
                 />
                 {errors.name && (
@@ -97,7 +97,7 @@ export default function RegisterPage() {
                 <input
                   type="email"
                   {...register("email")}
-                  placeholder="name@email.com"
+                  placeholder="alex@example.com"
                   className="w-full rounded-xl border bg-background px-3.5 py-2 text-sm outline-none focus:border-indigo-500"
                 />
                 {errors.email && (
@@ -113,7 +113,7 @@ export default function RegisterPage() {
                 </label>
                 <input
                   {...register("phone")}
-                  placeholder="e.g. +1 234 567 8900"
+                  placeholder="+1 (555) 234-5678"
                   className="w-full rounded-xl border bg-background px-3.5 py-2 text-sm outline-none focus:border-indigo-500"
                 />
                 {errors.phone && (
@@ -141,7 +141,7 @@ export default function RegisterPage() {
               </label>
               <input
                 {...register("address")}
-                placeholder="Street address, city, postal code"
+                placeholder="123 Fintech Ave, Austin, TX"
                 className="w-full rounded-xl border bg-background px-3.5 py-2 text-sm outline-none focus:border-indigo-500"
               />
               {errors.address && (
@@ -172,7 +172,7 @@ export default function RegisterPage() {
                   type="password"
                   maxLength={6}
                   {...register("transactionPin")}
-                  placeholder="e.g. 1234"
+                  placeholder="1234"
                   className="w-full rounded-xl border bg-background px-3.5 py-2 text-sm outline-none focus:border-indigo-500"
                 />
                 {errors.transactionPin && (
