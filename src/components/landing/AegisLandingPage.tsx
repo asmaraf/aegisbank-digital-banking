@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import Lenis from "lenis";
 import {
   motion,
@@ -19,6 +20,8 @@ import {
   CheckCircle2,
   Menu,
   X,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 function AnimatedCounter({
@@ -183,6 +186,8 @@ const MARQUEE_ITEMS = [
 
 export function AegisLandingPage() {
   const prefersReduced = useReducedMotion();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const [activeRole, setActiveRole] = useState<"customer" | "staff" | "admin">("customer");
@@ -198,6 +203,7 @@ export function AegisLandingPage() {
   const securityRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     const check = () => setIsMobile(window.innerWidth < 1024);
     check();
     window.addEventListener("resize", check);
@@ -347,6 +353,18 @@ export function AegisLandingPage() {
           </nav>
 
           <div className="hidden items-center gap-2.5 md:flex">
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="rounded-full border p-2 text-muted-foreground transition hover:border-indigo-500/40 hover:text-foreground"
+              aria-label="Toggle theme"
+              title="Toggle Light/Dark Theme"
+            >
+              {mounted && theme === "dark" ? (
+                <Sun className="h-3.5 w-3.5" />
+              ) : (
+                <Moon className="h-3.5 w-3.5" />
+              )}
+            </button>
             <Link
               href="/login"
               className="rounded-full px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
@@ -396,7 +414,26 @@ export function AegisLandingPage() {
                   </a>
                 ))}
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-2 border-t pt-4">
+              <div className="mt-4 flex items-center justify-between border-t pt-4">
+                <span className="text-xs text-muted-foreground">Theme</span>
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium"
+                >
+                  {mounted && theme === "dark" ? (
+                    <>
+                      <Sun className="h-3.5 w-3.5" />
+                      <span>Light</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="h-3.5 w-3.5" />
+                      <span>Dark</span>
+                    </>
+                  )}
+                </button>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2">
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
