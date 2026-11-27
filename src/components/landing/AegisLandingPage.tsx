@@ -328,22 +328,14 @@ export function AegisLandingPage() {
               <div className="flex items-center gap-2">
                 <Link
                   href={dashboardHref}
-                  className="group flex items-center gap-2 rounded-full border border-border/80 bg-background/80 py-1 pl-1.5 pr-2.5 text-xs transition hover:border-indigo-500/50 hover:bg-muted"
-                  title={`Signed in as ${session.user.name} (${session.user.role})`}
+                  className="group flex items-center gap-2 rounded-full border border-border/80 bg-background/80 py-1 pl-1.5 pr-3 text-xs transition hover:border-indigo-500/50 hover:bg-muted"
+                  title={`Signed in as ${session.user.name}`}
                 >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 text-[11px] font-bold text-white shadow-sm">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-bold text-white shadow-sm">
                     {session.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
                   </div>
-                  <div className="flex flex-col text-left leading-none">
-                    <span className="max-w-[120px] truncate font-semibold text-foreground text-xs group-hover:text-indigo-500 transition-colors">
-                      {session.user.name}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground font-mono">
-                      ID: {session.user.id ? `${session.user.id.slice(0, 8)}...` : session.user.email}
-                    </span>
-                  </div>
-                  <span className="rounded-full bg-indigo-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-indigo-500 border border-indigo-500/20">
-                    {session.user.role}
+                  <span className="font-semibold text-foreground text-xs group-hover:text-indigo-500 transition-colors">
+                    {session.user.name}
                   </span>
                 </Link>
 
@@ -444,18 +436,10 @@ export function AegisLandingPage() {
               {isAuthenticated && session?.user ? (
                 <div className="mt-3 space-y-2.5 border-t pt-3">
                   <div className="flex items-center gap-3 rounded-2xl border bg-muted/40 p-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 text-sm font-bold text-white shadow-sm">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white shadow-sm">
                       {session.user.name ? session.user.name.charAt(0).toUpperCase() : "U"}
                     </div>
-                    <div className="flex min-w-0 flex-1 flex-col">
-                      <span className="font-semibold text-sm truncate">{session.user.name}</span>
-                      <span className="text-xs text-muted-foreground font-mono truncate">
-                        ID: {session.user.id ? `${session.user.id.slice(0, 10)}...` : session.user.email}
-                      </span>
-                    </div>
-                    <span className="rounded-full bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold uppercase text-indigo-500 border border-indigo-500/20">
-                      {session.user.role}
-                    </span>
+                    <span className="font-semibold text-sm truncate">{session.user.name}</span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
