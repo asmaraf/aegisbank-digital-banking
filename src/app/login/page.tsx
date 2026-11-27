@@ -95,6 +95,11 @@ function LoginFormContent() {
         </div>
 
         <div className="rounded-2xl border border-white/15 bg-card/95 p-6 shadow-2xl backdrop-blur-md">
+          {searchParams.get("callbackUrl") === "/customer/transfer" && (
+            <div className="mb-4 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3 text-xs text-indigo-300">
+              <span className="font-semibold text-white">Customer login required:</span> Sign in with a Customer account to transfer funds.
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-muted-foreground">

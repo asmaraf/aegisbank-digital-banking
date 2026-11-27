@@ -91,6 +91,9 @@ export function CurrencyCalculatorWidget() {
 
   const handleSendMoney = () => {
     if (!session?.user) {
+      toast.info("Customer account required", {
+        description: "Sign in with a customer account to transfer funds.",
+      });
       router.push("/login?callbackUrl=/customer/transfer");
       return;
     }
