@@ -101,7 +101,7 @@ export default function CustomerRequestsPage() {
 
               <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">
-                  Amount (USD)
+                  Amount (BDT / ৳)
                 </label>
                 <input
                   type="number"

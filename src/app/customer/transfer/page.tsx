@@ -172,7 +172,7 @@ export default function CustomerTransferPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">
-                  3. Amount (USD)
+                  3. Amount (BDT / ৳)
                 </label>
                 <input
                   type="number"

@@ -2,7 +2,16 @@
 
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { formatDateTime } from "@/lib/utils";
+
+function formatPDFCurrency(amount: number | string | null | undefined): string {
+  const num = Number(amount ?? 0);
+  const safe = Number.isFinite(num) ? num : 0;
+  return `BDT ${safe.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
 
 export interface ExportTransaction {
   transactionId: string;
@@ -59,7 +68,7 @@ export function downloadTransactionReceiptPDF(tx: ExportTransaction) {
   doc.setTextColor(17, 24, 39); // #111827 Dark text
   doc.setFontSize(19);
   doc.setFont("helvetica", "bold");
-  doc.text(formatCurrency(tx.amount), pageWidth / 2, 44, { align: "center" });
+  doc.text(formatPDFCurrency(tx.amount), pageWidth / 2, 44, { align: "center" });
 
   // Transaction Type Pill
   doc.setFillColor(243, 244, 246);
@@ -83,8 +92,8 @@ export function downloadTransactionReceiptPDF(tx: ExportTransaction) {
     ["Status", tx.status],
     ["Sender Account", tx.senderAccountNumber || "System / External"],
     ["Receiver Account", tx.receiverAccountNumber || "System / External"],
-    ["Transfer Fee", formatCurrency(tx.fee)],
-    ["Total Settled", formatCurrency(totalAmount)],
+    ["Transfer Fee", formatPDFCurrency(tx.fee)],
+    ["Total Settled", formatPDFCurrency(totalAmount)],
     ["Description", tx.description || "Digital banking transaction"],
   ];
 
@@ -165,7 +174,7 @@ export function downloadAccountStatementPDF(
   doc.setFontSize(11);
   doc.text(`Account Holder: ${holderName}`, 14, 48);
   doc.text(`Account Number: ${accountNumber} (${accountType})`, 14, 55);
-  doc.text(`Current Balance: ${formatCurrency(balance)}`, 14, 62);
+  doc.text(`Current Balance: ${formatPDFCurrency(balance)}`, 14, 62);
 
   autoTable(doc, {
     startY: 70,
@@ -176,7 +185,7 @@ export function downloadAccountStatementPDF(
       tx.transactionId,
       tx.type.replace("_", " "),
       tx.description,
-      formatCurrency(tx.amount),
+      formatPDFCurrency(tx.amount),
       tx.status,
     ]),
     styles: { fontSize: 8 },

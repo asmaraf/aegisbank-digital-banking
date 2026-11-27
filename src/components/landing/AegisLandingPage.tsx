@@ -566,7 +566,7 @@ export function AegisLandingPage() {
               <div className="flex items-center justify-between border-b pb-4">
                 <div>
                   <p className="text-xs text-muted-foreground">Combined Balance</p>
-                  <p className="text-xl font-bold">$92,650.50</p>
+                  <p className="text-xl font-bold">৳92,650.50</p>
                 </div>
                 <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                   Active
@@ -595,11 +595,11 @@ export function AegisLandingPage() {
               <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
                 <div className="rounded-xl border bg-background p-3">
                   <p className="text-muted-foreground">Savings • 0001</p>
-                  <p className="mt-1 font-bold">$28,450.00</p>
+                  <p className="mt-1 font-bold">৳28,450.00</p>
                 </div>
                 <div className="rounded-xl border bg-background p-3">
                   <p className="text-muted-foreground">Business • 0002</p>
-                  <p className="mt-1 font-bold">$64,200.50</p>
+                  <p className="mt-1 font-bold">৳64,200.50</p>
                 </div>
               </div>
             </motion.div>
@@ -615,7 +615,7 @@ export function AegisLandingPage() {
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold tracking-wider">AEGIS BUSINESS</span>
                 <span className="rounded bg-white/15 px-1.5 py-0.5 text-[10px]">
-                  USD
+                  BDT
                 </span>
               </div>
               <p className="mt-5 font-mono text-sm tracking-widest">

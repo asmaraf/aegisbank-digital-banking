@@ -238,7 +238,7 @@ export default function AdminAccountsPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-muted-foreground">
-                    Initial Deposit ($)
+                    Initial Deposit (৳)
                   </label>
                   <input
                     type="number"
@@ -278,7 +278,7 @@ export default function AdminAccountsPage() {
             <form onSubmit={handleSaveLimits} className="mt-4 space-y-3">
               <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">
-                  Daily Transfer Limit ($)
+                  Daily Transfer Limit (৳)
                 </label>
                 <input
                   type="number"
@@ -294,7 +294,7 @@ export default function AdminAccountsPage() {
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">
-                  Max Single Transaction ($)
+                  Max Single Transaction (৳)
                 </label>
                 <input
                   type="number"
@@ -310,7 +310,7 @@ export default function AdminAccountsPage() {
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">
-                  Minimum Balance ($)
+                  Minimum Balance (৳)
                 </label>
                 <input
                   type="number"

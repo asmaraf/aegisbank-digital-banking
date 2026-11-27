@@ -7,12 +7,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatCurrency(amount: number | string | null | undefined): string {
   const num = Number(amount ?? 0);
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
+  const safe = Number.isFinite(num) ? num : 0;
+  return `৳${safe.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(num);
+  })}`;
 }
 
 export function formatDate(date: string | Date): string {
