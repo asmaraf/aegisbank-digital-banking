@@ -287,7 +287,24 @@ export default function CustomerDashboardPage() {
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
                     <XAxis dataKey="month" fontSize={12} />
                     <YAxis fontSize={12} />
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0F172A",
+                        borderColor: "#334155",
+                        borderRadius: "0.75rem",
+                        color: "#F8FAFC",
+                        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)",
+                      }}
+                      labelStyle={{
+                        color: "#F8FAFC",
+                        fontWeight: "700",
+                        marginBottom: "4px",
+                      }}
+                      itemStyle={{
+                        fontSize: "0.8rem",
+                        fontWeight: "600",
+                      }}
+                    />
                     <Bar
                       dataKey="deposits"
                       name="Deposits"
@@ -319,7 +336,24 @@ export default function CustomerDashboardPage() {
                         <Cell key={idx} fill={PIE_COLORS[idx % PIE_COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0F172A",
+                        borderColor: "#334155",
+                        borderRadius: "0.75rem",
+                        color: "#F8FAFC",
+                        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)",
+                      }}
+                      labelStyle={{
+                        color: "#F8FAFC",
+                        fontWeight: "700",
+                        marginBottom: "4px",
+                      }}
+                      itemStyle={{
+                        fontSize: "0.8rem",
+                        fontWeight: "600",
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               )}

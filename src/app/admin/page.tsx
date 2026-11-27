@@ -27,6 +27,25 @@ import { formatCurrency } from "@/lib/utils";
 
 const COLORS = ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
 
+const chartTooltipConfig = {
+  contentStyle: {
+    backgroundColor: "#0F172A",
+    borderColor: "#334155",
+    borderRadius: "0.75rem",
+    color: "#F8FAFC",
+    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5)",
+  },
+  labelStyle: {
+    color: "#F8FAFC",
+    fontWeight: "700" as const,
+    marginBottom: "4px",
+  },
+  itemStyle: {
+    fontSize: "0.8rem",
+    fontWeight: "600" as const,
+  },
+};
+
 export default function AdminDashboardPage() {
   const { data, isLoading } = useGetAnalyticsQuery();
   const [chartTab, setChartTab] = useState<"volume" | "flows" | "portfolio">("volume");
@@ -193,7 +212,7 @@ export default function AdminDashboardPage() {
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
                     <XAxis dataKey="month" fontSize={12} />
                     <YAxis fontSize={12} />
-                    <Tooltip />
+                    <Tooltip {...chartTooltipConfig} />
                     <Area
                       type="monotone"
                       dataKey="volume"
@@ -214,7 +233,7 @@ export default function AdminDashboardPage() {
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
                     <XAxis dataKey="month" fontSize={12} />
                     <YAxis fontSize={12} />
-                    <Tooltip />
+                    <Tooltip {...chartTooltipConfig} />
                     <Legend />
                     <Bar
                       dataKey="deposits"
@@ -255,7 +274,7 @@ export default function AdminDashboardPage() {
                           <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip {...chartTooltipConfig} />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
@@ -270,7 +289,7 @@ export default function AdminDashboardPage() {
                       <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
                       <XAxis dataKey="name" fontSize={12} />
                       <YAxis fontSize={12} allowDecimals={false} />
-                      <Tooltip />
+                      <Tooltip {...chartTooltipConfig} />
                       <Bar
                         dataKey="value"
                         name="Applications"
