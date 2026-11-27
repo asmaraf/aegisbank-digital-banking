@@ -2,6 +2,8 @@
 
 A full-stack, production-grade Digital Banking Management System built with **Next.js 14 (App Router)**, **TypeScript**, **Tailwind CSS**, **Redux Toolkit + RTK Query**, **Recharts**, **NextAuth.js**, and **Prisma (PostgreSQL)**.
 
+![AegisBank Hero & Banking Workspace Preview](./public/preview.png)
+
 ---
 
 ## Project Overview
