@@ -82,7 +82,6 @@ function AnimatedCounter({
 const NAV_LINKS = [
   { id: "features", label: "Features" },
   { id: "how-it-works", label: "How it works" },
-  { id: "roles", label: "Portals" },
   { id: "security", label: "Security" },
 ];
 
@@ -125,60 +124,6 @@ const STICKY_FEATURES = [
   },
 ];
 
-const ROLE_TABS = [
-  {
-    id: "customer",
-    label: "Customer",
-    headline: "Personal and business accounts",
-    summary:
-      "Switch between Savings, Current, and Business accounts, send PIN-verified transfers, apply for loans, and download PDF or CSV statements.",
-    metrics: [
-      { label: "Total Balance", value: "$92,650.50" },
-      { label: "Active Loan", value: "$10,000.00" },
-      { label: "Monthly Deposits", value: "+$18,000.00" },
-    ],
-    rows: [
-      "Savings • 1001000001 — $28,450.00",
-      "Business • 1001000002 — $64,200.50",
-      "Loan Installment #3 Paid — $1,085.00",
-    ],
-  },
-  {
-    id: "staff",
-    label: "Bank Staff",
-    headline: "Customer onboarding and queues",
-    summary:
-      "Register new customers, verify customer details, approve or reject deposit and withdrawal requests, flag unusual activity, and forward loans.",
-    metrics: [
-      { label: "Pending Requests", value: "2 Open" },
-      { label: "KYC Verified", value: "67%" },
-      { label: "Loan Reviews", value: "2 Open" },
-    ],
-    rows: [
-      "Deposit Request $3,500.00 — Pending",
-      "Withdrawal Request $950.00 — Pending",
-      "Loan Application #L-104 — Forwarded",
-    ],
-  },
-  {
-    id: "admin",
-    label: "Admin",
-    headline: "Bank-wide oversight and limits",
-    summary:
-      "Monitor total bank balances, freeze accounts, set transfer limits, reverse transfers, and approve or reject loan applications.",
-    metrics: [
-      { label: "Bank Balance", value: "$112,750.75" },
-      { label: "Flagged Items", value: "1 Alert" },
-      { label: "Pending Loans", value: "2 Review" },
-    ],
-    rows: [
-      "TXN-202611-100011 ($6,400) — Flagged",
-      "Default Daily Limit — $10,000.00",
-      "Business Loan — Disbursed $12,000.00",
-    ],
-  },
-];
-
 const MARQUEE_ITEMS = [
   "SAVINGS ACCOUNTS",
   "CURRENT ACCOUNTS",
@@ -196,7 +141,6 @@ export function AegisLandingPage() {
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
-  const [activeRole, setActiveRole] = useState<"customer" | "staff" | "admin">("customer");
 
   const isAuthenticated = mounted && status === "authenticated" && Boolean(session?.user);
 
@@ -330,7 +274,6 @@ export function AegisLandingPage() {
   );
 
   const headlineWords = ["Digital", "banking", "built", "for", "daily", "operations."];
-  const currentRole = ROLE_TABS.find((r) => r.id === activeRole) ?? ROLE_TABS[0];
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-indigo-500/20">
@@ -903,100 +846,7 @@ export function AegisLandingPage() {
         </div>
       </section>
 
-      {/* 5. ROLE SHOWCASE: Tabs for Customer / Staff / Admin */}
-      <section id="roles" className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-        <motion.div
-          initial={prefersReduced ? false : { opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.4 }}
-          className="text-center"
-        >
-          <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            Role Portals
-          </span>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            Built for each user role
-          </h2>
-
-          <div className="mt-8 inline-flex rounded-2xl border bg-card p-1.5 shadow-sm">
-            {ROLE_TABS.map((tab) => {
-              const isSelected = activeRole === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveRole(tab.id as typeof activeRole)}
-                  className={`relative rounded-xl px-4 py-2 text-xs font-semibold transition sm:text-sm ${isSelected ? "text-white" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                >
-                  {isSelected && (
-                    <motion.span
-                      layoutId="roleTabPill"
-                      className="absolute inset-0 rounded-xl bg-indigo-600"
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    />
-                  )}
-                  <span className="relative z-10">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </motion.div>
-
-        <div className="mt-10 rounded-3xl border bg-card p-6 shadow-xl sm:p-8">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentRole.id}
-              initial={prefersReduced ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={prefersReduced ? undefined : { opacity: 0, y: -10 }}
-              transition={{ duration: 0.25 }}
-              className="grid gap-8 lg:grid-cols-12"
-            >
-              <div className="lg:col-span-5">
-                <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-                  {currentRole.label} Portal
-                </span>
-                <h3 className="mt-4 text-2xl font-bold">{currentRole.headline}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {currentRole.summary}
-                </p>
-                <Link
-                  href="/login"
-                  className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-indigo-700"
-                >
-                  Open {currentRole.label} Demo
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-
-              <div className="space-y-4 lg:col-span-7">
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {currentRole.metrics.map((m) => (
-                    <div key={m.label} className="rounded-2xl border bg-background p-4">
-                      <p className="text-[11px] text-muted-foreground">{m.label}</p>
-                      <p className="mt-1 text-lg font-bold">{m.value}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="space-y-2">
-                  {currentRole.rows.map((row) => (
-                    <div
-                      key={row}
-                      className="flex items-center justify-between rounded-xl border bg-background px-4 py-3 text-xs font-medium"
-                    >
-                      <span>{row}</span>
-                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </section>
-
-      {/* 6. SECURITY: Dark Section with Lower Parallax Image + Animated Shield */}
+      {/* 5. SECURITY: Dark Section with Lower Parallax Image + Animated Shield */}
       <section
         id="security"
         ref={securityRef}
