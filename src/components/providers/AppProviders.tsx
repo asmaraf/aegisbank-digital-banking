@@ -37,7 +37,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       <Provider store={store}>
         <ThemeProvider attribute="class" defaultTheme="dark" storageKey="aegisbank-theme" enableSystem={false}>
           <SessionSync>{children}</SessionSync>
-          <Toaster richColors position="top-right" closeButton />
+          <Toaster position="top-right" closeButton={false} />
         </ThemeProvider>
       </Provider>
     </SessionProvider>

@@ -38,7 +38,9 @@ export default function AdminStaffPage() {
       const json = await res.json();
       setStaff(json.staff ?? []);
     } catch {
-      toast.error("Failed to load bank staff");
+      toast.error("Load failed", {
+        description: "Refresh to reload the bank staff roster.",
+      });
     } finally {
       setLoading(false);
     }
@@ -59,15 +61,21 @@ export default function AdminStaffPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error || "Failed to register staff");
+        toast.error("Registration failed", {
+          description: json.error || "Review credentials and retry.",
+        });
         return;
       }
-      toast.success("Bank staff account created");
+      toast.success("Staff registered", {
+        description: "New bank staff member added to roster.",
+      });
       setForm({ name: "", email: "", phone: "", address: "", password: "" });
       setShowModal(false);
       loadStaff();
     } catch {
-      toast.error("Network error");
+      toast.error("Network error", {
+        description: "Check server connection and retry.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -81,13 +89,19 @@ export default function AdminStaffPage() {
         body: JSON.stringify({ id, status }),
       });
       if (!res.ok) {
-        toast.error("Failed to update staff status");
+        toast.error("Update failed", {
+          description: "Check permissions and retry.",
+        });
         return;
       }
-      toast.success(`Staff status set to ${status}`);
+      toast.success("Status updated", {
+        description: `Staff member marked as ${status}.`,
+      });
       loadStaff();
     } catch {
-      toast.error("Network error");
+      toast.error("Network error", {
+        description: "Check server connection and retry.",
+      });
     }
   };
 

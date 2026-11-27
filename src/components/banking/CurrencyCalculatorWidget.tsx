@@ -91,15 +91,16 @@ export function CurrencyCalculatorWidget() {
 
   const handleSendMoney = () => {
     if (!session?.user) {
-      toast.info("Please sign in as a Customer to send money.");
-      router.push("/login");
-    } else if (session.user.role === "CUSTOMER") {
+      router.push("/login?callbackUrl=/customer/transfer");
+      return;
+    }
+    if (session.user.role === "CUSTOMER") {
       router.push("/customer/transfer");
     } else {
-      toast.info(
-        `You are logged in as ${session.user.role}. Please sign in with a Customer account to transfer funds.`
-      );
-      router.push("/login");
+      toast.info("Customer account required", {
+        description: "Sign in with a customer account to transfer funds.",
+      });
+      router.push("/login?callbackUrl=/customer/transfer");
     }
   };
 

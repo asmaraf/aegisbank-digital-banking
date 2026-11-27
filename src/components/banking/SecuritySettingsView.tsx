@@ -37,40 +37,47 @@ export function SecuritySettingsView({ isAdmin = false }: { isAdmin?: boolean })
   const handlePinSubmit = async (values: PinForm) => {
     try {
       await updateSettings({ scope: "pin", ...values }).unwrap();
-      toast.success("Transaction PIN updated");
+      toast.success("PIN updated", {
+        description: "Use new transaction PIN for fund transfers.",
+      });
       pinForm.reset();
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Failed to update PIN"
-      );
+      toast.error("Update failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Enter 4 to 6 numeric digits.",
+      });
     }
   };
 
   const handleToggle2FA = async () => {
     if (!data?.profile) return;
     try {
+      const next = !data.profile.twoFactorEnabled;
       await updateSettings({
         scope: "twoFactor",
-        enabled: !data.profile.twoFactorEnabled,
+        enabled: next,
       }).unwrap();
-      toast.success(
-        `Two-Factor Authentication ${
-          !data.profile.twoFactorEnabled ? "enabled" : "disabled"
-        }`
-      );
+      toast.success("2FA updated", {
+        description: `Two-factor authentication ${next ? "enabled" : "disabled"}.`,
+      });
     } catch {
-      toast.error("Failed to update 2FA setting");
+      toast.error("Update failed", {
+        description: "Retry toggling two-factor authentication.",
+      });
     }
   };
 
   const handleBankSettingsSubmit = async (values: BankSettingsForm) => {
     try {
       await updateSettings({ scope: "bank", settings: values }).unwrap();
-      toast.success("Bank-wide financial settings updated");
+      toast.success("Settings saved", {
+        description: "Bank-wide financial parameters updated.",
+      });
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Failed to save settings"
-      );
+      toast.error("Update failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Check parameter values.",
+      });
     }
   };
 

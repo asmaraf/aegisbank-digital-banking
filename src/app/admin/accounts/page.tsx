@@ -49,12 +49,15 @@ export default function AdminAccountsPage() {
     e.preventDefault();
     try {
       await createAccount(newAcc).unwrap();
-      toast.success("Bank account created");
+      toast.success("Account created", {
+        description: "New bank account activated for customer.",
+      });
       setShowCreate(false);
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Failed to create account"
-      );
+      toast.error("Creation failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Review account details and retry.",
+      });
     }
   };
 
@@ -63,10 +66,14 @@ export default function AdminAccountsPage() {
     const nextStatus = freezeTarget.status === "FROZEN" ? "ACTIVE" : "FROZEN";
     try {
       await updateAccount({ id: freezeTarget.id, status: nextStatus }).unwrap();
-      toast.success(`Account ${nextStatus.toLowerCase()}`);
+      toast.success("Status updated", {
+        description: `Account marked as ${nextStatus.toLowerCase()}.`,
+      });
       setFreezeTarget(null);
     } catch {
-      toast.error("Failed to update account status");
+      toast.error("Update failed", {
+        description: "Retry updating account status.",
+      });
     }
   };
 
@@ -75,10 +82,14 @@ export default function AdminAccountsPage() {
     if (!editLimitsAcc) return;
     try {
       await updateAccount({ id: editLimitsAcc.id, ...limitsForm }).unwrap();
-      toast.success("Account transaction limits updated");
+      toast.success("Limits updated", {
+        description: "New transaction limits saved.",
+      });
       setEditLimitsAcc(null);
     } catch {
-      toast.error("Failed to update limits");
+      toast.error("Update failed", {
+        description: "Enter valid limit values and retry.",
+      });
     }
   };
 

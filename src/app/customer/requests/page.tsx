@@ -40,12 +40,15 @@ export default function CustomerRequestsPage() {
   const onSubmit = async (values: RequestForm) => {
     try {
       await createRequest(values).unwrap();
-      toast.success(`${values.type} request submitted for approval`);
+      toast.success("Request submitted", {
+        description: `${values.type} request queued for staff review.`,
+      });
       reset();
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Request failed"
-      );
+      toast.error("Request failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Review amount and retry.",
+      });
     }
   };
 

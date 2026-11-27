@@ -48,23 +48,29 @@ export default function CustomerLoansPage() {
   const onSubmit = async (values: LoanForm) => {
     try {
       await applyLoan(values).unwrap();
-      toast.success("Loan application submitted!");
+      toast.success("Loan submitted", {
+        description: "Application queued for staff review.",
+      });
       reset();
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Application failed"
-      );
+      toast.error("Submission failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Review loan details and retry.",
+      });
     }
   };
 
   const handleRepay = async (loan: LoanApplicationDTO) => {
     try {
       await repayLoan({ id: loan.id, accountId: loan.accountId }).unwrap();
-      toast.success("Loan installment paid successfully!");
+      toast.success("Installment paid", {
+        description: "Loan schedule updated.",
+      });
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Repayment failed"
-      );
+      toast.error("Payment failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Check account balance and retry.",
+      });
     }
   };
 

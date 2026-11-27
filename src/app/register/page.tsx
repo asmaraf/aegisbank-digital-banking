@@ -37,13 +37,19 @@ export default function RegisterPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error || "Registration failed");
+        toast.error("Registration failed", {
+          description: json.error || "Review details and retry.",
+        });
         return;
       }
-      toast.success("Account created! You can now sign in.");
+      toast.success("Account created", {
+        description: "Sign in to access your portal.",
+      });
       router.push("/login");
     } catch {
-      toast.error("Network error during registration");
+      toast.error("Network error", {
+        description: "Check connection and retry.",
+      });
     } finally {
       setSubmitting(false);
     }

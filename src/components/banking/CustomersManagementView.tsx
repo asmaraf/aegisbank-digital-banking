@@ -48,13 +48,16 @@ export function CustomersManagementView({ role }: { role: "ADMIN" | "STAFF" }) {
   const handleCreate = async (values: NewCustomerForm) => {
     try {
       await registerCustomer(values).unwrap();
-      toast.success("Customer registered with initial bank account");
+      toast.success("Customer registered", {
+        description: "Initial bank account activated.",
+      });
       form.reset();
       setShowNewModal(false);
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Registration failed"
-      );
+      toast.error("Registration failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Review customer details and retry.",
+      });
     }
   };
 
@@ -65,12 +68,15 @@ export function CustomersManagementView({ role }: { role: "ADMIN" | "STAFF" }) {
         id: confirmStatus.customer.id,
         status: confirmStatus.status,
       }).unwrap();
-      toast.success(`Customer status updated to ${confirmStatus.status}`);
+      toast.success("Status updated", {
+        description: `Customer status set to ${confirmStatus.status}.`,
+      });
       setConfirmStatus(null);
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Failed to update status"
-      );
+      toast.error("Update failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Check permissions and retry.",
+      });
     }
   };
 
@@ -136,7 +142,9 @@ export function CustomersManagementView({ role }: { role: "ADMIN" | "STAFF" }) {
                         <button
                           onClick={async () => {
                             await updateCustomer({ id: c.id, kycVerified: true }).unwrap();
-                            toast.success("KYC verified");
+                            toast.success("KYC verified", {
+                              description: "Customer identity verified for transactions.",
+                            });
                           }}
                           className="rounded-lg border px-2 py-1 text-xs font-medium text-amber-600 hover:bg-amber-500/10"
                         >

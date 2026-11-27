@@ -35,12 +35,15 @@ export function LoansManagementView({ role }: { role: "ADMIN" | "STAFF" }) {
         action: confirmState.action,
         staffNotes: notesMap[confirmState.loan.id] || confirmState.loan.staffNotes || undefined,
       }).unwrap();
-      toast.success(`Loan ${confirmState.action.toLowerCase()}d successfully`);
+      toast.success("Loan updated", {
+        description: `Loan ${confirmState.action.toLowerCase()}ed in underwriting pipeline.`,
+      });
       setConfirmState(null);
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Loan action failed"
-      );
+      toast.error("Action failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Check loan status and retry.",
+      });
     }
   };
 

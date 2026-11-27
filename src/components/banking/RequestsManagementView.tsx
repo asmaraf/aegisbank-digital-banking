@@ -39,12 +39,15 @@ export function RequestsManagementView() {
             ? "Verified and settled by bank operations"
             : "Declined by bank operations",
       }).unwrap();
-      toast.success(`Request ${selected.decision.toLowerCase()} successfully`);
+      toast.success("Request updated", {
+        description: `Request marked as ${selected.decision.toLowerCase()}.`,
+      });
       setSelected(null);
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Operation failed"
-      );
+      toast.error("Operation failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error || "Check request state and retry.",
+      });
     }
   };
 

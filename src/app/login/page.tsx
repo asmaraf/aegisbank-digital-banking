@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,8 +19,9 @@ const DEMO_USERS = [
   { label: "Customer", email: "customer@aegisbank.com", pass: "Customer@123" },
 ];
 
-export default function LoginPage() {
+function LoginFormContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [submitting, setSubmitting] = useState(false);
 
   const {
@@ -42,14 +43,27 @@ export default function LoginPage() {
       });
 
       if (res?.error) {
-        toast.error(res.error);
+        toast.error("Authentication failed", {
+          description: res.error || "Verify credentials and retry.",
+        });
         return;
       }
 
-      toast.success("Signed in successfully");
-      router.replace("/dashboard");
+      toast.success("Signed in", {
+        description: "Redirecting to your portal.",
+      });
+
+      const callbackUrl = searchParams.get("callbackUrl");
+      const destination =
+        callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")
+          ? callbackUrl
+          : "/dashboard";
+
+      router.replace(destination);
     } catch {
-      toast.error("Unable to sign in. Please try again.");
+      toast.error("Sign in failed", {
+        description: "Check network connection and retry.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -162,5 +176,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0B0D14]" />}>
+      <LoginFormContent />
+    </Suspense>
   );
 }

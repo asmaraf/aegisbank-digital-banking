@@ -71,12 +71,14 @@ export function TransactionsView({
             ? "Flagged for suspicious pattern review"
             : undefined,
       }).unwrap();
-      toast.success(`Transaction ${confirmState.action.toLowerCase()}ed successfully`);
+      toast.success("Transaction updated", {
+        description: `Transaction ${confirmState.action.toLowerCase()}ed in ledger.`,
+      });
       setConfirmState(null);
     } catch (err: unknown) {
       const msg =
-        (err as { data?: { error?: string } })?.data?.error || "Action failed";
-      toast.error(msg);
+        (err as { data?: { error?: string } })?.data?.error || "Review transaction status and retry.";
+      toast.error("Action failed", { description: msg });
     }
   };
 

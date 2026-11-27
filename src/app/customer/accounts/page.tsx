@@ -35,9 +35,13 @@ export default function CustomerAccountsPage() {
       } else {
         downloadAccountStatementCSV(account.accountNumber, txs);
       }
-      toast.success(`Statement downloaded (${format})`);
+      toast.success("Statement downloaded", {
+        description: `${format} statement saved to your device.`,
+      });
     } catch {
-      toast.error("Failed to export statement");
+      toast.error("Export failed", {
+        description: "Select another date range or retry.",
+      });
     }
   };
 

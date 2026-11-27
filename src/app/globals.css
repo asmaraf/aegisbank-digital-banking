@@ -58,3 +58,79 @@
     animation: none;
   }
 }
+
+/* AegisBank Custom Sonner Toast Design */
+[data-sonner-toast] {
+  background: hsl(var(--card)) !important;
+  color: hsl(var(--card-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 0.875rem !important;
+  padding: 0.875rem 1.125rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.2) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.25rem !important;
+  border-left-width: 4px !important;
+}
+
+[data-sonner-toast][data-type="info"] {
+  border-left-color: #6366f1 !important; /* Indigo */
+}
+
+[data-sonner-toast][data-type="success"] {
+  border-left-color: #10b981 !important; /* Emerald */
+}
+
+[data-sonner-toast][data-type="error"] {
+  border-left-color: #f43f5e !important; /* Rose */
+}
+
+[data-sonner-toast][data-type="warning"] {
+  border-left-color: #f59e0b !important; /* Amber */
+}
+
+/* Hide default icon box and close button */
+[data-sonner-toast] [data-icon] {
+  display: none !important;
+}
+
+[data-sonner-toast] [data-close-button] {
+  display: none !important;
+}
+
+/* Title in semibold */
+[data-sonner-toast] [data-title] {
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  color: hsl(var(--card-foreground)) !important;
+}
+
+/* Muted one-line description */
+[data-sonner-toast] [data-description] {
+  font-weight: 400 !important;
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+  color: hsl(var(--muted-foreground)) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+}
+
+/* Slide-in animation from top-right */
+@keyframes toast-slide-in-right {
+  from {
+    transform: translate3d(110%, 0, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+[data-sonner-toaster][data-x-position="right"] [data-sonner-toast] {
+  animation: toast-slide-in-right 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}

@@ -56,14 +56,18 @@ export default function CustomerTransferPage() {
         ...pendingValues,
         idempotencyKey,
       }).unwrap();
-      toast.success("Fund transfer completed!");
+      toast.success("Transfer completed", {
+        description: "Funds transferred to recipient account.",
+      });
       setCompletedTx(res.transaction);
       setPendingValues(null);
       reset();
     } catch (err: unknown) {
-      toast.error(
-        (err as { data?: { error?: string } })?.data?.error || "Transfer failed"
-      );
+      toast.error("Transfer failed", {
+        description:
+          (err as { data?: { error?: string } })?.data?.error ||
+          "Check account details and PIN.",
+      });
       setPendingValues(null);
     }
   };
