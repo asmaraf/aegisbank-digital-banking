@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   title: "AegisBank — Advanced Digital Banking Platform",
   description:
     "Modern digital banking management system with atomic transfers, role-based operations, loan lifecycle management, and real-time financial analytics.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
