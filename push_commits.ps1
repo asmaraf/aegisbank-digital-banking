@@ -159,10 +159,10 @@ Write-Host ">>> [30/32] Staging Root Layout & Styles..." -ForegroundColor Yellow
 git add src/app/layout.tsx src/app/page.tsx src/app/globals.css
 git commit -m "feat(core): configure RootLayout, dynamic landing page, and global design tokens"
 
-# 31. Documentation (README.md)
-Write-Host ">>> [31/32] Staging README.md..." -ForegroundColor Yellow
-git add README.md
-git commit -m "docs: add comprehensive production README with architecture, setup guide, and demo credentials"
+# 31. Documentation & Media (README.md & Preview Assets)
+Write-Host ">>> [31/32] Staging README.md and media preview assets..." -ForegroundColor Yellow
+git add README.md public/
+git commit -m "docs: add comprehensive production README with architecture, preview screenshot, and credentials"
 
 # 32. Remaining Files & Final Polish
 Write-Host ">>> [32/32] Staging remaining files..." -ForegroundColor Yellow
