@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import Lenis from "lenis";
+import { CurrencyCalculatorWidget } from "@/components/banking/CurrencyCalculatorWidget";
 import {
   motion,
   useScroll,
@@ -643,13 +644,12 @@ export function AegisLandingPage() {
         </div>
       </section>
 
-      {/* 3. FEATURES: Sticky Scroll Section with Dark Banking Parallax Background */}
+      {/* 3. GLOBAL TRANSFERS & LIVE FX CALCULATOR */}
       <section
         id="features"
         ref={stickyRef}
-        className="relative isolate overflow-clip bg-[#0B0D14] py-24 text-white"
+        className="relative isolate overflow-clip bg-[#0B0D14] py-20 text-white sm:py-28"
       >
-        {/* Parallax Banking Image Layer */}
         <motion.div
           aria-hidden="true"
           style={{
@@ -657,136 +657,79 @@ export function AegisLandingPage() {
             scale: featuresBgScale,
             backgroundImage: "url('/images/banking-parallax.jpg')",
           }}
-          className="pointer-events-none absolute -inset-y-24 inset-x-0 z-0 bg-cover bg-center bg-no-repeat"
+          className="pointer-events-none absolute -inset-y-24 inset-x-0 z-0 bg-cover bg-center bg-no-repeat opacity-40"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-[1] bg-[#0B0D14]/65 backdrop-blur-[1px]"
+          className="pointer-events-none absolute inset-0 z-[1] bg-[#0B0D14]/75 backdrop-blur-[2px]"
         />
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-5">
-            <div className="lg:sticky lg:top-28">
-              <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400">
-                Core Features
-              </span>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Built for daily banking workflows
-              </h2>
+          <div className="grid items-center gap-12 lg:grid-cols-12">
+            {/* Left Column: Context & Feature Highlights */}
+            <div className="space-y-6 lg:col-span-6">
+              <div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  Global Remittance & Transfers
+                </span>
+                <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-5xl">
+                  Send securely to 140+ countries.
+                </h2>
+                <p className="mt-4 text-base leading-relaxed text-slate-300">
+                  Convert and send money worldwide with guaranteed real-time exchange rates, transparent low fees, and instant atomic settlement. Every transfer is backed by server-side PIN checks and downloadable PDF receipts.
+                </p>
+              </div>
 
-              <div className="mt-8 space-y-4">
-                {STICKY_FEATURES.map((feat, idx) => {
-                  const isActive = idx === activeFeature;
-                  return (
-                    <button
-                      key={feat.id}
-                      onClick={() => setActiveFeature(idx)}
-                      className={`w-full rounded-2xl border p-4 text-left backdrop-blur-md transition ${isActive
-                          ? "border-indigo-400/70 bg-[#0B0D14]/75 shadow-lg"
-                          : "border-white/15 bg-[#0B0D14]/50 opacity-75 hover:opacity-100"
-                        }`}
-                    >
-                      <p className="text-[11px] font-semibold uppercase text-indigo-400">
-                        {feat.badge}
-                      </p>
-                      <h3 className="mt-1 text-base font-semibold text-white">
-                        {feat.title}
-                      </h3>
-                      {isActive && (
-                        <p className="mt-1.5 text-xs leading-relaxed text-slate-300">
-                          {feat.description}
-                        </p>
-                      )}
-                    </button>
-                  );
-                })}
+              <div className="space-y-3.5 pt-2">
+                {[
+                  {
+                    title: "Live Exchange Rate Guarantee",
+                    desc: "Rates locked at transfer time with zero hidden spreads or weekend markups.",
+                  },
+                  {
+                    title: "Multi-Currency Accounts",
+                    desc: "Seamlessly switch between USD, EUR, GBP, and BDT accounts within one portal.",
+                  },
+                  {
+                    title: "Atomic Ledger Consistency",
+                    desc: "Money debits and credits simultaneously with automatic rollback on error.",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.title}
+                    className="flex items-start gap-3.5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-sm"
+                  >
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
+                    <div>
+                      <h4 className="text-sm font-semibold text-white">{item.title}</h4>
+                      <p className="mt-0.5 text-xs text-slate-400">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-700"
+                >
+                  <span>Open Banking Portal</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/register"
+                  className="rounded-2xl border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  Create Customer Account
+                </Link>
               </div>
             </div>
-          </div>
 
-          <div className="space-y-8 lg:col-span-7">
-            <div className="rounded-3xl border border-white/15 bg-[#0B0D14]/75 p-6 shadow-2xl backdrop-blur-md lg:sticky lg:top-28 sm:p-8">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={STICKY_FEATURES[activeFeature].id}
-                  initial={prefersReduced ? false : { opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={prefersReduced ? undefined : { opacity: 0, y: -12 }}
-                  transition={{ duration: 0.25 }}
-                >
-                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                    <span className="text-xs font-semibold uppercase text-indigo-400">
-                      {STICKY_FEATURES[activeFeature].badge}
-                    </span>
-                    <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
-                      Included
-                    </span>
-                  </div>
-
-                  <h3 className="mt-5 text-2xl font-bold text-white">
-                    {STICKY_FEATURES[activeFeature].title}
-                  </h3>
-                  <p className="mt-2 text-sm text-slate-300">
-                    {STICKY_FEATURES[activeFeature].description}
-                  </p>
-
-                  <div className="mt-6 space-y-3">
-                    {STICKY_FEATURES[activeFeature].points.map((pt) => (
-                      <div
-                        key={pt}
-                        className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-100"
-                      >
-                        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
-                        <span>{pt}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Real UI Snippet Preview (No Decorative Icons) */}
-                  <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.05] p-4">
-                    {activeFeature === 0 && (
-                      <div className="flex items-center justify-between text-xs">
-                        <div>
-                          <p className="font-mono font-semibold text-white">1001000001 → 1001000003</p>
-                          <p className="text-slate-400">TXN-202611-100011</p>
-                        </div>
-                        <span className="rounded-lg bg-emerald-600 px-2.5 py-1 font-semibold text-white">
-                          $3,200.00 Completed
-                        </span>
-                      </div>
-                    )}
-                    {activeFeature === 1 && (
-                      <div className="flex items-center justify-between text-xs">
-                        <div>
-                          <p className="font-semibold text-white">Business Account • 1001000002</p>
-                          <p className="text-slate-400">Available Balance</p>
-                        </div>
-                        <span className="font-mono text-base font-bold text-emerald-400">
-                          $64,200.50
-                        </span>
-                      </div>
-                    )}
-                    {activeFeature === 2 && (
-                      <div className="flex items-center justify-between text-xs">
-                        <div>
-                          <p className="font-semibold text-white">Daily Transfer Limit</p>
-                          <p className="text-slate-400">Account 1001000001</p>
-                        </div>
-                        <span className="rounded-lg bg-indigo-600 px-2.5 py-1 font-semibold text-white">
-                          $15,000.00 / day
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+            {/* Right Column: Interactive Live Currency Calculator Widget */}
+            <div className="flex justify-center lg:col-span-6">
+              <CurrencyCalculatorWidget />
             </div>
-
-            <div className="hidden h-48 lg:block" />
-            <div className="hidden h-48 lg:block" />
           </div>
-        </div>
         </div>
       </section>
 
