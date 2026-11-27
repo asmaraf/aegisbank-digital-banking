@@ -142,6 +142,11 @@ export function DashboardShell({
   const role = session?.user?.role || "CUSTOMER";
   const navGroups = NAV_GROUPS_BY_ROLE[role] || NAV_GROUPS_BY_ROLE.CUSTOMER;
 
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    window.location.href = "/login";
+  };
+
   const { data: notifData } = useGetNotificationsQuery(undefined, {
     skip: !session?.user,
     pollingInterval: 120000,
@@ -246,7 +251,7 @@ export function DashboardShell({
 
         <div className="border-t p-3">
           <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={handleLogout}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-500/10 dark:text-red-400"
           >
             <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.5} />
@@ -422,7 +427,7 @@ export function DashboardShell({
                     Security & Settings
                   </Link>
                   <button
-                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    onClick={handleLogout}
                     className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-500/10"
                   >
                     <LogOut className="h-3.5 w-3.5" />
