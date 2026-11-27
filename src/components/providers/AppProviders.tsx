@@ -35,7 +35,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider refetchOnWindowFocus={false}>
       <Provider store={store}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <SessionSync>{children}</SessionSync>
           <Toaster richColors position="top-right" closeButton />
         </ThemeProvider>
