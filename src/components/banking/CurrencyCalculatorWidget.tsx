@@ -94,9 +94,9 @@ export function CurrencyCalculatorWidget() {
   });
 
   return (
-    <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-3xl border bg-card shadow-2xl transition-all">
+    <div className="relative mx-auto w-full max-w-md rounded-3xl border bg-card shadow-2xl transition-all">
       {/* Top Banner (Vibrant Emerald / Forest Gradient as in reference) */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 p-6 text-white">
+      <div className="relative rounded-t-3xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 p-6 text-white">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"
@@ -125,36 +125,50 @@ export function CurrencyCalculatorWidget() {
               </div>
               <span className="flex items-center gap-1 rounded-xl bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800">
                 Change
-                <ChevronDown className="h-3 w-3" />
+                <ChevronDown className={`h-3 w-3 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
               </span>
             </button>
 
-            {/* Dropdown Menu */}
+            {/* Dropdown Menu with High z-index & No Overflow Clipping */}
             {dropdownOpen && (
-              <div className="absolute inset-x-0 top-full z-30 mt-2 max-h-56 overflow-y-auto rounded-2xl border bg-card p-1.5 shadow-2xl">
-                {DESTINATIONS.map((dest) => (
-                  <button
-                    key={dest.code}
-                    type="button"
-                    onClick={() => {
-                      setSelectedDest(dest);
-                      setDropdownOpen(false);
-                    }}
-                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition ${
-                      dest.code === selectedDest.code
-                        ? "bg-indigo-600/10 font-bold text-indigo-600 dark:text-indigo-400"
-                        : "text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">{dest.flag}</span>
-                      <span>{dest.name}</span>
-                      <span className="text-muted-foreground">({dest.currency})</span>
-                    </div>
-                    {dest.code === selectedDest.code && <Check className="h-3.5 w-3.5 text-indigo-600" />}
-                  </button>
-                ))}
-              </div>
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setDropdownOpen(false)}
+                />
+                <div className="absolute inset-x-0 top-full z-50 mt-2 max-h-64 overflow-y-auto rounded-2xl border bg-card p-1.5 shadow-2xl ring-1 ring-black/10">
+                  {DESTINATIONS.map((dest) => (
+                    <button
+                      key={dest.code}
+                      type="button"
+                      onClick={() => {
+                        setSelectedDest(dest);
+                        setDropdownOpen(false);
+                      }}
+                      className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-xs transition ${
+                        dest.code === selectedDest.code
+                          ? "bg-emerald-600 font-bold text-white shadow-sm"
+                          : "text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-base">{dest.flag}</span>
+                        <span className="font-semibold">{dest.name}</span>
+                        <span className={dest.code === selectedDest.code ? "text-emerald-100" : "text-muted-foreground"}>
+                          ({dest.currency})
+                        </span>
+                      </div>
+                      {dest.code === selectedDest.code ? (
+                        <Check className="h-4 w-4 text-white" />
+                      ) : (
+                        <span className="font-mono text-[11px] text-muted-foreground">
+                          1 USD = {dest.ratePerUSD}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
