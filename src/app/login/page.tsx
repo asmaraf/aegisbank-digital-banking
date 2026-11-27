@@ -13,12 +13,6 @@ import { loginSchema } from "@/lib/validations";
 
 type LoginForm = z.infer<typeof loginSchema>;
 
-const DEMO_USERS = [
-  { label: "Admin", email: "admin@aegisbank.com", pass: "Admin@123" },
-  { label: "Bank Staff", email: "staff@aegisbank.com", pass: "Staff@123" },
-  { label: "Customer", email: "customer@aegisbank.com", pass: "Customer@123" },
-];
-
 export default function LoginPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -127,28 +121,6 @@ export default function LoginPage() {
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
-
-          {/* Quick Demo Credentials */}
-          <div className="mt-6 border-t pt-4">
-            <p className="text-xs font-medium text-muted-foreground">
-              Quick Demo Access (Click to fill):
-            </p>
-            <div className="mt-2.5 grid grid-cols-3 gap-2">
-              {DEMO_USERS.map((u) => (
-                <button
-                  key={u.label}
-                  type="button"
-                  onClick={() => {
-                    setValue("email", u.email);
-                    setValue("password", u.pass);
-                  }}
-                  className="rounded-xl border bg-background px-2.5 py-2 text-xs font-medium hover:border-indigo-500 hover:bg-indigo-500/5"
-                >
-                  {u.label}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         <p className="text-center text-sm text-slate-300">
